@@ -46,7 +46,19 @@ void main()
 
     // globalAmbient is independent of distance from the light source
     vec3 globalAmbient = vec3(0.1, 0.1, 0.1);
-    color.rgb = globalAmbient  + ambient + diffuse + specular;
+
+    //  resource from http://learnwebgl.brown37.net/09_lights/lights_attenuation.html#
+    //  with the distance between light source and object increase, idensity will decrease
+    //  so if the light source close to the object, the object will be light.
+    //  otherwise, it will be dark
+    float c1 = 0.02;
+    float c2 = 0.05;
+
+    float distance_object_to_light = length(Lvec);
+
+    float attenuation = 1.0/(1.0+c1*distance_object_to_light+c2*distance_object_to_light*distance_object_to_light);
+
+    color.rgb = globalAmbient  + ((ambient + diffuse + specular) * attenuation);
     color.a = 1.0;
 
     gl_Position = Projection * ModelView * vpos;
