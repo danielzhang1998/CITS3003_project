@@ -522,6 +522,23 @@ static void adjustBlueBrightness(vec2 bl_br)
     sceneObjs[toolObj].brightness += bl_br[1];
 }
 
+// part C
+//  the ambient or diffuse light of the object can be interactively changed by dragging the left mouse button horizontally or vertically;
+//  follow the left button action
+static void adjust_ambient_diffuse(vec2 mat)
+{
+    sceneObjs[toolObj].ambient += mat[0];
+    sceneObjs[toolObj].diffuse += mat[1];
+}
+
+//  the specular light and amount of shine can be interactively adjusted by dragging the middle mouse button horizontally or vertically.
+//  follow the middle button action
+static void adjust_specular_shine(vec2 mat1)
+{
+    sceneObjs[toolObj].specular += mat1[0];
+    sceneObjs[toolObj].shine += mat1[1];
+}
+
 static void lightMenu(int id)
 {
     deactivateTool();
@@ -574,16 +591,31 @@ static void materialMenu(int id)
     deactivateTool();
     if (currObject < 0)
         return;
+    //  id == 10 means the "R/G/B/All" mode
     if (id == 10)
     {
         toolObj = currObject;
         setToolCallbacks(adjustRedGreen, mat2(1, 0, 0, 1),
                          adjustBlueBrightness, mat2(1, 0, 0, 1));
     }
+    // part C
     // You'll need to fill in the remaining menu items here.
+    /*
+    change the ambient, diffuse or specular, shine when click on the left or middle button
+    id == 20 means the "UNIMPLEMENTED: Ambient/Diffuse/Specular/Shine" mode
+    */
+    else if (id == 20)
+    {
+        toolObj = currObject;
+        setToolCallbacks(adjust_ambient_diffuse, mat2(1, 0, 0, 1),
+                         adjust_specular_shine, mat2(1, 0, 0, 1));
+    }
     else
     {
         printf("Error in materialMenu\n");
+        //toolObj = currObject;
+        //setToolCallbacks(adjustLocXZ, camRotZ(),
+        //                 adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
     }
 }
 
@@ -625,7 +657,9 @@ static void makeMenu()
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All", 10);
-    glutAddMenuEntry("UNIMPLEMENTED: Ambient/Diffuse/Specular/Shine", 20);
+
+    //  renmae the menu name and keep the same id
+    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine", 20);
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
@@ -725,11 +759,31 @@ void reshape(int width, int height)
     //         that the same part of the scene is visible across the width of
     //         the window.
 
-    GLfloat nearDist = 0.2;
-    projection = Frustum(-nearDist * (float)width / (float)height,
-                         nearDist * (float)width / (float)height,
-                         -nearDist, nearDist,
-                         nearDist, 100.0);
+    //  part D
+    // makes the near distance smaller
+    GLfloat nearDist = 0.002;
+
+    //  part E
+    //  when width < height, we need to change the bottom and top
+    //  otherwise, we need to change left and right
+    if (width < height)
+    //  (float)height / (float)width > 1
+    {
+        projection = Frustum(-nearDist,
+                             nearDist,
+                             -nearDist * (float)height / (float)width,
+                             nearDist * (float)height / (float)width,
+                             nearDist, 100.0);
+    }
+    else
+    //  (float)width / (float)height > 1
+    {
+        projection = Frustum(-nearDist * (float)width / (float)height,
+                             nearDist * (float)width / (float)height,
+                             -nearDist,
+                             nearDist,
+                             nearDist, 100.0);
+    }
 }
 
 //----------------------------------------------------------------------------
