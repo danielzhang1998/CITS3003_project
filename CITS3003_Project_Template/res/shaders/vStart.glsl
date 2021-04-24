@@ -47,6 +47,7 @@ void main()
     // globalAmbient is independent of distance from the light source
     vec3 globalAmbient = vec3(0.1, 0.1, 0.1);
 
+    //  part F
     //  resource from http://learnwebgl.brown37.net/09_lights/lights_attenuation.html#
     //  with the distance between light source and object increase, idensity will decrease
     //  so if the light source close to the object, the object will be light.
