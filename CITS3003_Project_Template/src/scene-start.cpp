@@ -658,7 +658,7 @@ static void makeMenu()
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All", 10);
 
-    //  renmae the menu name and keep the same id
+    //  rename the menu name and keep the same id
     glutAddMenuEntry("Ambient/Diffuse/Specular/Shine", 20);
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
