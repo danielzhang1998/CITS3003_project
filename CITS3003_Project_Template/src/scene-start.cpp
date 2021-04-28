@@ -356,7 +356,7 @@ void init(void)
     projectionU = glGetUniformLocation(shaderProgram, "Projection");
     modelViewU = glGetUniformLocation(shaderProgram, "ModelView");
 
-    // Objects 0, and 1 are the ground and the first light.
+    // Objects 0, and 1 are the ground and the light.
     addObject(0); // Square for the ground
     sceneObjs[0].loc = vec4(0.0, 0.0, 0.0, 1.0);
     sceneObjs[0].scale = 10.0;
@@ -368,6 +368,17 @@ void init(void)
     sceneObjs[1].scale = 0.1;
     sceneObjs[1].texId = 0;        // Plain texture
     sceneObjs[1].brightness = 0.2; // The light's brightness is 5 times this (below).
+
+    /*
+    part I
+    by searching the function which add a new object, then we focous on addObject()
+    in init(), it calls addObject() objects 0, and 1 are the ground and the light.
+    */
+    addObject(55);
+    sceneObjs[2].loc = vec4(6.0, 1.0, 1.0, 1.0);
+    sceneObjs[2].scale = 0.1;
+    sceneObjs[2].texId = 0;        // Plain texture
+    sceneObjs[2].brightness = 0.2; // The light's brightness is 5 times this (below).
 
     addObject(rand() % numMeshes); // A test mesh
 
@@ -450,10 +461,20 @@ void display(void)
     */
     mat4 rotateY = RotateY(camRotSidewaysDeg);  //  rotate Y axis
     mat4 rotateX = RotateX(camRotUpAndOverDeg); //  rotate X axis
-    view = Translate(0.0, 0.0, -viewDist) * rotateX * rotateY;
+    mat4 Rotate = rotateX * rotateY;
+    //  C = TR
+    view = Translate(0.0, 0.0, -viewDist) * Rotate;
 
     SceneObject lightObj1 = sceneObjs[1];
     vec4 lightPosition1 = view * lightObj1.loc;
+
+    /*
+    part I
+    to make the second light
+    light 2 is directional
+    */
+    SceneObject lightObj2 = sceneObjs[2];
+    vec4 lightPosition2 = Rotate * lightObj2.loc;
 
     glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition1"),
                  1, lightPosition1);
@@ -461,6 +482,15 @@ void display(void)
     glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor1"), 1, lightObj1.rgb);
     CheckError();
     glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness1"), lightObj1.brightness);
+    CheckError();
+
+    // the second light
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition2"),
+                 1, lightPosition2);
+    CheckError();
+    glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor2"), 1, lightObj2.rgb);
+    CheckError();
+    glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness2"), lightObj2.brightness);
     CheckError();
 
     for (int i = 0; i < nObjects; i++)
@@ -558,15 +588,23 @@ static void lightMenu(int id)
         setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
                          adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
     }
-    /*
+
     //  part I
+    //  move the light 2
+    //  change the R/G/B/ALL of the light 2
+    //  ID for "Move Light 2" is 80
     else if (id == 80)
     {
+        toolObj = 2; //  the object need to modify. it is for light 2, so it is 2
+        setToolCallbacks(adjustLocXZ, camRotZ(),
+                         adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
     }
     else if (id >= 81 && id <= 84)
     {
+        toolObj = 2; //  the object need to modify. it is for light 2, so it is 2
+        setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
+                         adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
     }
-    */
     else
     {
         printf("Error in lightMenu\n");
