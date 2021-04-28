@@ -10,8 +10,6 @@ uniform mat4 ModelView;
 uniform mat4 Projection;
 
 void main() {
-
-    // Transform the vertex position and vertex normal with boneTransform
     position = vec4(vPosition, 1.0);
 
     normal = vNormal;

@@ -27,20 +27,19 @@ void main() {
 
     // Transform vertex normal into eye coordinates (assumes scaling
     // is uniform across dimensions)
-    vec3 N = normalize((ModelView*vec4(normal, 0.0)).xyz);
+    vec3 N = normalize( (ModelView*vec4(normal, 0.0)).xyz);
 
     // Compute terms in the illumination equation
     vec3 ambient = (LightColor1 * LightBrightness1) * AmbientProduct;
 
-    float Kd = max(dot(L, N), 0.0);
+    float Kd = max( dot(L, N), 0.0);
     vec3 diffuse = Kd * (LightColor1 * LightBrightness1) * DiffuseProduct;
 
-    float Ks = pow(max(dot(N, H), 0.0), Shininess);
+    float Ks = pow( max(dot(N, H), 0.0), Shininess);
     vec3 specular = Ks * LightBrightness1 * SpecularProduct;
 
     if (dot(L, N) < 0.0 ) {
         specular = vec3(0.0, 0.0, 0.0);
-        
     }
 
     vec3 globalAmbient = vec3(0.1, 0.1, 0.1);
@@ -50,9 +49,9 @@ void main() {
     //  so if the light source close to the object, the object will be light.
     //  otherwise, it will be dark
     
-    float a = 0.03;
-    float b = 0.005;
-    float c = 0.005;
+    float a = 0.025;
+    float b = 0.0045;
+    float c = 0.0045;
 
     float distance_object_to_light = length(Lvec);
 
