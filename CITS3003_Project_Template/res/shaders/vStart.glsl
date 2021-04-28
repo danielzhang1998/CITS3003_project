@@ -2,6 +2,31 @@ attribute vec3 vPosition;
 attribute vec3 vNormal;
 attribute vec2 vTexCoord;
 
+varying vec4 position;
+varying vec3 normal;
+varying vec2 texCoord;
+
+uniform mat4 ModelView;
+uniform mat4 Projection;
+
+void main() {
+
+    // Transform the vertex position and vertex normal with boneTransform
+    position = vec4(vPosition, 1.0);
+
+    normal = vNormal;
+    texCoord = vTexCoord;
+
+    gl_Position = Projection * ModelView * position;
+}
+
+
+//  version for part F
+/*
+attribute vec3 vPosition;
+attribute vec3 vNormal;
+attribute vec2 vTexCoord;
+
 varying vec2 texCoord;
 varying vec4 color;
 
@@ -65,3 +90,4 @@ void main()
     gl_Position = Projection * ModelView * vpos;
     texCoord = vTexCoord;
 }
+*/
