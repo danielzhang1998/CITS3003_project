@@ -476,6 +476,10 @@ void display(void)
     SceneObject lightObj2 = sceneObjs[2];
     vec4 lightPosition2 = Rotate * lightObj2.loc;
 
+    /*
+    part H
+    add the light color and light rtightness
+    */
     glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition1"),
                  1, lightPosition1);
     CheckError();
@@ -682,6 +686,49 @@ static void adjustAngleZTexscale(vec2 az_ts)
     sceneObjs[currObject].texScale += az_ts[1];
 }
 
+/*
+part J
+*/
+//  function to duplicated the object
+static void duplicated_object(int cur_obj_id)
+{
+    //std::cout << nObjects << std::endl;
+    //  two lights, a test mesh and a square for the ground is 4
+    //  if no test mesh, can not duplicate the object (no object) and return
+    if (nObjects == 3)
+    {
+        //printf("no object to duplicate!\n");
+        return;
+    }
+    sceneObjs[nObjects] = sceneObjs[cur_obj_id];
+    toolObj = cur_obj_id = nObjects++;
+    //  set a new object at the same place with the original one
+    setToolCallbacks(adjustLocXZ, camRotZ(),
+                     adjustScaleY, mat2(0.05, 0, 0, 10));
+    //  redisplay the current window
+    glutPostRedisplay();
+}
+
+//  function to delete the object
+static void delete_object(int cur_obj_id)
+{
+    if (nObjects == 3)
+    {
+        //printf("no object to delete!\n");
+        return;
+    }
+    nObjects--;
+    if (nObjects > 3)
+    {
+        currObject = nObjects - 1;
+    }
+    else
+    {
+        currObject = -1;
+    }
+    glutPostRedisplay();
+}
+
 static void mainmenu(int id)
 {
     deactivateTool();
@@ -697,6 +744,16 @@ static void mainmenu(int id)
     {
         setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
                          adjustAngleZTexscale, mat2(400, 0, 0, 15));
+    }
+    //  part J when user click on the button, call the duplicate function
+    if (id == 90 && currObject >= 0)
+    {
+        duplicated_object(currObject);
+    }
+    //  call the delte function
+    if (id == 91 && currObject >= 0)
+    {
+        delete_object(currObject);
     }
     if (id == 99)
         exit(0);
@@ -730,6 +787,10 @@ static void makeMenu()
     glutAddSubMenu("Texture", texMenuId);
     glutAddSubMenu("Ground Texture", groundMenuId);
     glutAddSubMenu("Lights", lightMenuId);
+    //  part J duplicated the object
+    glutAddMenuEntry("Duplicated the object", 90);
+    //  part J delete the object
+    glutAddMenuEntry("Delte the object", 91);
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }

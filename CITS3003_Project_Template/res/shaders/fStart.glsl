@@ -38,6 +38,9 @@ void main() {
     // is uniform across dimensions)
     vec3 N = normalize( (ModelView*vec4(normal, 0.0)).xyz);
 
+    //  part H
+    //  Click to know more from: https://en.wikipedia.org/wiki/Phong_reflection_model
+
     // Compute terms in the illumination equation
     vec3 ambient1 = (LightColor1 * LightBrightness1) * AmbientProduct;
     vec3 ambient2 = (LightColor2 * LightBrightness2) * AmbientProduct;
@@ -66,16 +69,17 @@ void main() {
     //  so if the light source close to the object, the object will be light.
     //  otherwise, it will be dark
     
-    float a = 0.025;
-    float b = 0.0045;
-    float c = 0.0045;
+    float a = 0.1;
+    float b = 0.045;
+    float c = 0.0075;
 
     float distance_object_to_light = length(Lvec1);
 
-    float attenuation = 1.0/(a+b*distance_object_to_light+c*distance_object_to_light*distance_object_to_light);
+    float attenuation = 1.0/(a+b*distance_object_to_light+c*(distance_object_to_light*distance_object_to_light));
 
     //  part I
-    color.rgb = globalAmbient  + ((ambient1 + diffuse1 + specular1) * attenuation) + ((ambient2 + diffuse2 + specular2) * attenuation);
+    //  Phone reflection
+    color.rgb = globalAmbient  + ((ambient1 + diffuse1 + specular1) * attenuation) + (ambient2 + diffuse2 + specular2);
     color.a = 1.0;
 
     gl_FragColor = color * texture2D(texture, texCoord * 2.0);
