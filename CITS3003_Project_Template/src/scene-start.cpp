@@ -490,7 +490,8 @@ void display(void)
     need for spotlight
     */
     //   add sth.
-
+    SceneObject lightObj3 = sceneObjs[3];
+    vec4 lightPosition3 = view * lightObj3.loc;
     /*
     part H
     add the light color and light rtightness
@@ -510,6 +511,15 @@ void display(void)
     glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor2"), 1, lightObj2.rgb);
     CheckError();
     glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness2"), lightObj2.brightness);
+    CheckError();
+
+    //  the spot light
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition3"),
+                 1, lightPosition3);
+    CheckError();
+    glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor3"), 1, lightObj3.rgb);
+    CheckError();
+    glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness3"), lightObj3.brightness);
     CheckError();
 
     for (int i = 0; i < nObjects; i++)

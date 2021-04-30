@@ -33,7 +33,7 @@ add_subdirectory(lib/assimp EXCLUDE_FROM_ALL)
 add_subdirectory(lib/bitmap)
 add_subdirectory(lib/angel)
 
-add_executable(start_scene src/scene-start.cpp src/gnatidread.h src/gnatidread2.h)
+add_executable(start_scene src/scene-start.cpp src/gnatidread.h src/gnatidread2.h lib/glm/glm.hpp)
 
 if (MSVC)
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT start_scene)
