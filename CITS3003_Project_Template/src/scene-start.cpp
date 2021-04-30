@@ -378,7 +378,16 @@ void init(void)
     sceneObjs[2].loc = vec4(6.0, 1.0, 1.0, 1.0);
     sceneObjs[2].scale = 0.1;
     sceneObjs[2].texId = 0;        // Plain texture
-    sceneObjs[2].brightness = 0.2; // The light's brightness is 5 times this (below).
+    sceneObjs[2].brightness = 1.0; // The light's brightness is 5 times this (below).
+
+    /*
+    part J spotlight
+    */
+    addObject(55);
+    sceneObjs[3].loc = vec4(-1.0, 1.0, 2.0, 1.0);
+    sceneObjs[3].scale = 0.1;
+    sceneObjs[3].texId = 0;        // Plain texture
+    sceneObjs[3].brightness = 0.2; // The light's brightness is 5 times this (below).
 
     addObject(rand() % numMeshes); // A test mesh
 
@@ -475,6 +484,12 @@ void display(void)
     */
     SceneObject lightObj2 = sceneObjs[2];
     vec4 lightPosition2 = Rotate * lightObj2.loc;
+
+    /*
+    part J
+    need for spotlight
+    */
+    //   add sth.
 
     /*
     part H
@@ -577,6 +592,18 @@ static void adjust_specular_shine(vec2 mat1)
     sceneObjs[toolObj].shine += mat1[1];
 }
 
+static void adjustAngleYX(vec2 angle_yx)
+{
+    sceneObjs[currObject].angles[1] += angle_yx[0];
+    sceneObjs[currObject].angles[0] += angle_yx[1];
+}
+
+static void adjustAngleZTexscale(vec2 az_ts)
+{
+    sceneObjs[currObject].angles[2] += az_ts[0];
+    sceneObjs[currObject].texScale += az_ts[1];
+}
+
 static void lightMenu(int id)
 {
     deactivateTool();
@@ -608,6 +635,26 @@ static void lightMenu(int id)
         toolObj = 2; //  the object need to modify. it is for light 2, so it is 2
         setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
                          adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
+    }
+
+    //  part J
+    else if (id == 100)
+    {
+        toolObj = 3; //  the object need to modify. it is for light 3, so it is 3
+        setToolCallbacks(adjustLocXZ, camRotZ(),
+                         adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
+    }
+    else if (id >= 101 && id <= 104)
+    {
+        toolObj = 3; //  the object need to modify. it is for light 3 (spotlight), so it is 3
+        setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
+                         adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
+    }
+    else if (id == 110)
+    {
+        currObject = 3;
+        setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
+                         adjustAngleZTexscale, mat2(400, 0, 0, 15));
     }
     else
     {
@@ -674,18 +721,6 @@ static void materialMenu(int id)
     }
 }
 
-static void adjustAngleYX(vec2 angle_yx)
-{
-    sceneObjs[currObject].angles[1] += angle_yx[0];
-    sceneObjs[currObject].angles[0] += angle_yx[1];
-}
-
-static void adjustAngleZTexscale(vec2 az_ts)
-{
-    sceneObjs[currObject].angles[2] += az_ts[0];
-    sceneObjs[currObject].texScale += az_ts[1];
-}
-
 /*
 part J
 */
@@ -695,7 +730,7 @@ static void duplicated_object(int cur_obj_id)
     //std::cout << nObjects << std::endl;
     //  two lights, a test mesh and a square for the ground is 4
     //  if no test mesh, can not duplicate the object (no object) and return
-    if (nObjects == 3)
+    if (nObjects == 4)
     {
         //printf("no object to duplicate!\n");
         return;
@@ -712,13 +747,13 @@ static void duplicated_object(int cur_obj_id)
 //  function to delete the object
 static void delete_object(int cur_obj_id)
 {
-    if (nObjects == 3)
+    if (nObjects == 4)
     {
         //printf("no object to delete!\n");
         return;
     }
     nObjects--;
-    if (nObjects > 3)
+    if (nObjects > 4)
     {
         currObject = nObjects - 1;
     }
@@ -740,8 +775,11 @@ static void mainmenu(int id)
     }
     if (id == 50)
         doRotate();
+    //  object rotate
     if (id == 55 && currObject >= 0)
     {
+        //currObject = 4;
+        std::cout << currObject << std::endl;
         setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
                          adjustAngleZTexscale, mat2(400, 0, 0, 15));
     }
@@ -777,6 +815,11 @@ static void makeMenu()
     glutAddMenuEntry("R/G/B/All Light 1", 71);
     glutAddMenuEntry("Move Light 2", 80);
     glutAddMenuEntry("R/G/B/All Light 2", 81);
+
+    //  part J spotlight
+    glutAddMenuEntry("Move Spotlight", 100);
+    glutAddMenuEntry("R/G/B/All Spotlight", 101);
+    glutAddMenuEntry("Rotate the spotlight", 110);
 
     glutCreateMenu(mainmenu);
     glutAddMenuEntry("Rotate/Move Camera", 50);

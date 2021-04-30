@@ -69,9 +69,9 @@ void main() {
     //  so if the light source close to the object, the object will be light.
     //  otherwise, it will be dark
     
-    float a = 0.1;
-    float b = 0.045;
-    float c = 0.0075;
+    float a = 0.03;
+    float b = 0.027;
+    float c = 0.0028;
 
     float distance_object_to_light = length(Lvec1);
 
@@ -79,8 +79,8 @@ void main() {
 
     //  part I
     //  Phone reflection
-    color.rgb = globalAmbient  + ((ambient1 + diffuse1 + specular1) * attenuation) + (ambient2 + diffuse2 + specular2);
+    color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2);
     color.a = 1.0;
 
-    gl_FragColor = color * texture2D(texture, texCoord * 2.0);
+    gl_FragColor = color * texture2D(texture, texCoord * 2.0) +vec4((specular1*attenuation) + specular2, 1.0);
 }
