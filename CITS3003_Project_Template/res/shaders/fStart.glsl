@@ -74,7 +74,7 @@ void main() {
     vec3 specular3 = Ks3 * LightBrightness3 * SpecularProduct;
 
 
-    float cutoff = 3.1415926/180.0*12.5;
+    float cutoff = cos(3.1415926/180.0*12.5);
 
     float theta = dot( L3, vec3(LightLoc3));
 
