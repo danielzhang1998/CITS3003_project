@@ -521,6 +521,11 @@ void display(void)
     CheckError();
     glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness3"), lightObj3.brightness);
     CheckError();
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightLoc3"), 1, lightObj3.loc);
+    CheckError();
+
+    //glUniform4fv(glGetUniformLocation(shaderProgram, "camere_loc"), 1, sceneObjs[0].loc);
+    //CheckError();
 
     for (int i = 0; i < nObjects; i++)
     {
@@ -651,20 +656,9 @@ static void lightMenu(int id)
     else if (id == 100)
     {
         toolObj = 3; //  the object need to modify. it is for light 3, so it is 3
+        //std::cout << sceneObjs[toolObj].loc << std::endl;
         setToolCallbacks(adjustLocXZ, camRotZ(),
                          adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
-    }
-    else if (id >= 101 && id <= 104)
-    {
-        toolObj = 3; //  the object need to modify. it is for light 3 (spotlight), so it is 3
-        setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
-                         adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
-    }
-    else if (id == 110)
-    {
-        currObject = 3;
-        setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
-                         adjustAngleZTexscale, mat2(400, 0, 0, 15));
     }
     else
     {
@@ -828,8 +822,6 @@ static void makeMenu()
 
     //  part J spotlight
     glutAddMenuEntry("Move Spotlight", 100);
-    glutAddMenuEntry("R/G/B/All Spotlight", 101);
-    glutAddMenuEntry("Rotate the spotlight", 110);
 
     glutCreateMenu(mainmenu);
     glutAddMenuEntry("Rotate/Move Camera", 50);

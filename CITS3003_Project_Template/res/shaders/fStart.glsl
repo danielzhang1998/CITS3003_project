@@ -21,6 +21,7 @@ uniform float LightBrightness2; //  the brightness of light2
 uniform vec4 LightPosition3;    //  the position of spotlight
 uniform vec3 LightColor3;   //  the color of spotlight
 uniform float LightBrightness3; //  the brightness of spotlight
+uniform vec4 LightLoc3; //  location of the spotlight
 
 void main() {
     vec3 pos = (ModelView * position).xyz;
@@ -46,7 +47,7 @@ void main() {
     // is uniform across dimensions)
     vec3 N = normalize( (ModelView*vec4(normal, 0.0)).xyz);
 
-    vec3 reflectDir = normalize(-reflect(Lvec3,N));
+    vec3 reflectDir = reflect(-Lvec3,N);
 
     //  part H
     //  Click to know more from: https://en.wikipedia.org/wiki/Phong_reflection_model
@@ -67,21 +68,15 @@ void main() {
 
     float Ks1 = pow( max(dot(N, H1), 0.0), Shininess);
     float Ks2 = pow( max(dot(N, H2), 0.0), Shininess);
-    float Ks3 = pow( max(dot(reflectDir, E), 0.0),Shininess);
+    float Ks3 = pow( max(dot(reflectDir, Lvec3), 0.0),Shininess);
     vec3 specular1 = Ks1 * LightBrightness1 * SpecularProduct;
     vec3 specular2 = Ks2 * LightBrightness2 * SpecularProduct;
     vec3 specular3 = Ks3 * LightBrightness3 * SpecularProduct;
 
 
     float cutoff = 3.1415926/180.0*12.5;
-    float outercutoff = 3.1415926/180.0*17.5;
-    //  what doing here ??????????
-    float theta = dot( L3, vec3(0.10,0.10,0.10));
-    float epsilon = (cutoff - outercutoff);
-    float intensity = clamp((theta - outercutoff) / epsilon, 0.0, 1.0);
-    diffuse3 *= intensity;
-    specular3 *= intensity;
-    
+
+    float theta = dot( L3, vec3(LightLoc3));
 
     specular3 = clamp(specular3, 0.0, 1.0);
 
@@ -112,8 +107,17 @@ void main() {
 
     //  part I
     //  Phone reflection
-    color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2)+ ((ambient3 + diffuse3) * attenuation);
-    color.a = 1.0;
-
-    gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation) + (specular3*attenuation) + specular2, 1.0);
+    //if (theta > cutoff){
+        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2) + ambient3 + (diffuse3 * attenuation);
+        color.a = 1.0;
+        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation) + (specular3*attenuation) + specular2, 1.0);
+    
+    //}
+    /*
+    else{
+        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2);
+        color.a = 1.0;
+        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation) + specular2, 1.0);
+    }
+    */
 }
