@@ -97,27 +97,35 @@ void main() {
     //  so if the light source close to the object, the object will be light.
     //  otherwise, it will be dark
     
-    float a = 0.03;
+    float a = 1.0;
     float b = 0.027;
     float c = 0.0028;
 
-    float distance_object_to_light = length(Lvec1);
+    float distance_object_to_light_1 = length(Lvec1);
 
-    float attenuation = 1.0/(a+b*distance_object_to_light+c*(distance_object_to_light*distance_object_to_light));
+    float attenuation1 = 1.0/(a+b*distance_object_to_light_1+c*(distance_object_to_light_1*distance_object_to_light_1));
+
+    float distance_object_to_light_2 = length(Lvec2);
+
+    float attenuation2 = 1.0/(a+b*distance_object_to_light_2+c*(distance_object_to_light_2*distance_object_to_light_2));
+
+    float distance_object_to_light_3 = length(Lvec3);
+
+    float attenuation3 = 1.0/(a+b*distance_object_to_light_3+c*(distance_object_to_light_3*distance_object_to_light_3));
 
     //  part I
     //  Phone reflection
     //if (theta > cutoff){
-        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2) + ambient3 + (diffuse3 * attenuation);
+        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
         color.a = 1.0;
-        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation) + (specular3*attenuation) + specular2, 1.0);
+        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation1) + (specular3*attenuation3) + specular2, 1.0);
     
     //}
     /*
     else{
-        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation) + (ambient2 + diffuse2);
+        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + (ambient2 + diffuse2);
         color.a = 1.0;
-        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation) + specular2, 1.0);
+        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation1) + specular2, 1.0);
     }
     */
 }

@@ -477,6 +477,9 @@ void display(void)
     SceneObject lightObj1 = sceneObjs[1];
     vec4 lightPosition1 = view * lightObj1.loc;
 
+    //  make the light 1 brighter
+    lightObj1.brightness = 0.6;
+
     /*
     part I
     to make the second light
