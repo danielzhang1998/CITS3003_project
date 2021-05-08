@@ -735,7 +735,7 @@ part J
 static void duplicated_object(int cur_obj_id)
 {
     //std::cout << nObjects << std::endl;
-    //  two lights, a test mesh and a square for the ground is 4
+    //  three lights, a test mesh and a square for the ground is 4
     //  if no test mesh, can not duplicate the object (no object) and return
     if (nObjects == 4)
     {
@@ -811,6 +811,9 @@ static void makeMenu()
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All", 10);
 
+    /*
+    part C
+    */
     //  rename the menu name and keep the same id
     glutAddMenuEntry("Ambient/Diffuse/Specular/Shine", 20);
 
