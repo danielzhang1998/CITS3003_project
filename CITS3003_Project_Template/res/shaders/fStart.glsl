@@ -1,6 +1,4 @@
 vec4 color;
-varying vec4 position;
-varying vec3 normal;
 varying vec2 texCoord;  // The third coordinate is always 0.0 and is discarded
 
 uniform sampler2D texture;
@@ -9,6 +7,7 @@ uniform vec3 AmbientProduct, DiffuseProduct, SpecularProduct;
 uniform mat4 ModelView;
 uniform mat4 Projection;
 uniform float Shininess;
+uniform float texScale;
 
 uniform vec4 LightPosition1;    //  the position of light1
 uniform vec3 LightColor1;   //  the color of light1
@@ -23,29 +22,27 @@ uniform vec3 LightColor3;   //  the color of spotlight
 uniform float LightBrightness3; //  the brightness of spotlight
 uniform vec4 LightLoc3; //  location of the spotlight
 
+varying vec3 fN;
+varying vec3 fV;
+varying vec3 Lvec1;
+varying vec3 Lvec2;
+varying vec3 Lvec3;
+
 void main() {
-    vec3 pos = (ModelView * position).xyz;
 
     //  part I to add light 2
     //  part J light3 is spotlight
 
-    // The vector to the light from the vertex
-    vec3 Lvec1 = LightPosition1.xyz - pos;
-    //  Vector to the light from the origin point
-    vec3 Lvec2 = LightPosition2.xyz;
-    
-    vec3 Lvec3 = LightPosition3.xyz - pos;
-
     vec3 L1 = normalize( Lvec1 );   // Direction to the light source
     vec3 L2 = normalize( Lvec2 );   // Direction to the light source
     vec3 L3 = normalize( Lvec3 );   // Direction to the light source
-    vec3 E = normalize( -pos );   // Direction to the eye/camera
+    vec3 E = normalize( fV );   // Direction to the eye/camera
     vec3 H1 = normalize( L1 + E );  // Halfway vector
     vec3 H2 = normalize( L2 + E );  // Halfway vector
 
     // Transform vertex normal into eye coordinates (assumes scaling
     // is uniform across dimensions)
-    vec3 N = normalize( (ModelView*vec4(normal, 0.0)).xyz);
+    vec3 N = normalize(fN);
 
     vec3 reflectDir = reflect(-Lvec3,N);
 
@@ -115,17 +112,8 @@ void main() {
 
     //  part I
     //  Phone reflection
-    //if (theta > cutoff){
-        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
-        color.a = 1.0;
-        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation1) + (specular3*attenuation3) + specular2, 1.0);
-    
-    //}
-    /*
-    else{
-        color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + (ambient2 + diffuse2);
-        color.a = 1.0;
-        gl_FragColor = color * texture2D(texture, texCoord * 2.0) + vec4((specular1*attenuation1) + specular2, 1.0);
-    }
-    */
+
+    color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
+    color.a = 1.0;
+    gl_FragColor = color * texture2D(texture, texCoord * texScale) + vec4((specular1*attenuation1) + (specular3*attenuation3) + specular2, 1.0);
 }

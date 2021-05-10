@@ -245,7 +245,7 @@ mat2 camRotZ()
 
 static void adjustCamrotsideViewdist(vec2 cv)
 {
-    cout << cv << endl;
+    //cout << cv << endl;
     camRotSidewaysDeg += cv[0];
     viewDist += cv[1];
 }
@@ -472,7 +472,7 @@ void display(void)
     mat4 rotateX = RotateX(camRotUpAndOverDeg); //  rotate X axis
     mat4 Rotate = rotateX * rotateY;
     //  C = TR
-    view = Translate(0.0, 0.0, -viewDist) * Rotate;
+    view = Translate(0.0, 0.0, -viewDist) * rotateX * rotateY;
 
     SceneObject lightObj1 = sceneObjs[1];
     vec4 lightPosition1 = view * lightObj1.loc;
@@ -786,7 +786,7 @@ static void mainmenu(int id)
     if (id == 55 && currObject >= 0)
     {
         //currObject = 4;
-        std::cout << currObject << std::endl;
+        //std::cout << currObject << std::endl;
         setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
                          adjustAngleZTexscale, mat2(400, 0, 0, 15));
     }
