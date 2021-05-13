@@ -115,5 +115,5 @@ void main() {
 
     color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
     color.a = 1.0;
-    gl_FragColor = color * texture2D(texture, texCoord * texScale) + vec4((specular1*attenuation1) + (specular3*attenuation3) + specular2, 1.0);
+    gl_FragColor = color * texture2D(texture, texCoord * texScale) + vec4((specular1*attenuation1), 0.0) + vec4((specular3*attenuation3),0.0) + vec4((specular2,0.0));
 }
