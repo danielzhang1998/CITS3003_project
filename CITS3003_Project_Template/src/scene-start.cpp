@@ -496,7 +496,7 @@ void display(void)
     SceneObject lightObj3 = sceneObjs[3];
     vec4 lightPosition3 = view * lightObj3.loc;
     /*
-    part H
+    part I
     add the light color and light rtightness
     */
     glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition1"),

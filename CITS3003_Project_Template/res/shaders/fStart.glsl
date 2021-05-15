@@ -46,7 +46,7 @@ void main() {
 
     vec3 reflectDir = reflect(-Lvec3,N);
 
-    //  part H
+
     //  Click to know more from: https://en.wikipedia.org/wiki/Phong_reflection_model
 
     // Compute terms in the illumination equation
@@ -70,10 +70,6 @@ void main() {
     vec3 specular2 = Ks2 * LightBrightness2 * SpecularProduct;
     vec3 specular3 = Ks3 * LightBrightness3 * SpecularProduct;
 
-
-    float cutoff = cos(3.1415926/180.0*12.5);
-
-    float theta = dot( L3, vec3(LightLoc3));
 
     specular3 = clamp(specular3, 0.0, 1.0);
 
@@ -110,10 +106,18 @@ void main() {
 
     float attenuation3 = 1.0/(a+b*distance_object_to_light_3+c*(distance_object_to_light_3*distance_object_to_light_3));
 
+    //  part J
+    float theta = 3.1415926/180.0*12.5;
+    float intensity = clamp((theta), 0.0, 1.0);
+    diffuse3 *= intensity;
+    specular3 *= intensity;
+
     //  part I
     //  Phone reflection
 
     color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
     color.a = 1.0;
+
+    //  part H
     gl_FragColor = color * texture2D(texture, texCoord * texScale) + vec4((specular1*attenuation1), 0.0) + vec4((specular3*attenuation3),0.0) + vec4((specular2,0.0));
 }
