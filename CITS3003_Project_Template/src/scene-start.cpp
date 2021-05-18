@@ -245,7 +245,7 @@ mat2 camRotZ()
 
 static void adjustCamrotsideViewdist(vec2 cv)
 {
-    cout << cv << endl;
+    //cout << cv << endl;
     camRotSidewaysDeg += cv[0];
     viewDist += cv[1];
 }
@@ -356,7 +356,7 @@ void init(void)
     projectionU = glGetUniformLocation(shaderProgram, "Projection");
     modelViewU = glGetUniformLocation(shaderProgram, "ModelView");
 
-    // Objects 0, and 1 are the ground and the first light.
+    // Objects 0, and 1 are the ground and the light.
     addObject(0); // Square for the ground
     sceneObjs[0].loc = vec4(0.0, 0.0, 0.0, 1.0);
     sceneObjs[0].scale = 10.0;
@@ -368,6 +368,26 @@ void init(void)
     sceneObjs[1].scale = 0.1;
     sceneObjs[1].texId = 0;        // Plain texture
     sceneObjs[1].brightness = 0.2; // The light's brightness is 5 times this (below).
+
+    /*
+    part I
+    by searching the function which add a new object, then we focous on addObject()
+    in init(), it calls addObject() objects 0, and 1 are the ground and the light.
+    */
+    addObject(55);
+    sceneObjs[2].loc = vec4(6.0, 1.0, 1.0, 1.0);
+    sceneObjs[2].scale = 0.1;
+    sceneObjs[2].texId = 0;        // Plain texture
+    sceneObjs[2].brightness = 1.0; // The light's brightness is 5 times this (below).
+
+    /*
+    part J spotlight
+    */
+    addObject(55);
+    sceneObjs[3].loc = vec4(-1.0, 1.0, 2.0, 1.0);
+    sceneObjs[3].scale = 0.1;
+    sceneObjs[3].texId = 0;        // Plain texture
+    sceneObjs[3].brightness = 0.2; // The light's brightness is 5 times this (below).
 
     addObject(rand() % numMeshes); // A test mesh
 
@@ -450,14 +470,65 @@ void display(void)
     */
     mat4 rotateY = RotateY(camRotSidewaysDeg);  //  rotate Y axis
     mat4 rotateX = RotateX(camRotUpAndOverDeg); //  rotate X axis
+    mat4 Rotate = rotateX * rotateY;
+    //  C = TR
     view = Translate(0.0, 0.0, -viewDist) * rotateX * rotateY;
 
     SceneObject lightObj1 = sceneObjs[1];
-    vec4 lightPosition = view * lightObj1.loc;
+    vec4 lightPosition1 = view * lightObj1.loc;
 
-    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition"),
-                 1, lightPosition);
+    //  make the light 1 brighter
+    lightObj1.brightness = 0.6;
+
+    /*
+    part I
+    to make the second light
+    light 2 is directional
+    */
+    SceneObject lightObj2 = sceneObjs[2];
+    vec4 lightPosition2 = Rotate * lightObj2.loc;
+
+    /*
+    part J
+    need for spotlight
+    */
+    //   add sth.
+    SceneObject lightObj3 = sceneObjs[3];
+    vec4 lightPosition3 = view * lightObj3.loc;
+    /*
+    part I
+    add the light color and light rtightness
+    */
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition1"),
+                 1, lightPosition1);
     CheckError();
+    glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor1"), 1, lightObj1.rgb);
+    CheckError();
+    glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness1"), lightObj1.brightness);
+    CheckError();
+
+    // the second light
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition2"),
+                 1, lightPosition2);
+    CheckError();
+    glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor2"), 1, lightObj2.rgb);
+    CheckError();
+    glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness2"), lightObj2.brightness);
+    CheckError();
+
+    //  the spot light
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightPosition3"),
+                 1, lightPosition3);
+    CheckError();
+    glUniform3fv(glGetUniformLocation(shaderProgram, "LightColor3"), 1, lightObj3.rgb);
+    CheckError();
+    glUniform1f(glGetUniformLocation(shaderProgram, "LightBrightness3"), lightObj3.brightness);
+    CheckError();
+    glUniform4fv(glGetUniformLocation(shaderProgram, "LightLoc3"), 1, lightObj3.loc);
+    CheckError();
+
+    //glUniform4fv(glGetUniformLocation(shaderProgram, "camere_loc"), 1, sceneObjs[0].loc);
+    //CheckError();
 
     for (int i = 0; i < nObjects; i++)
     {
@@ -522,6 +593,35 @@ static void adjustBlueBrightness(vec2 bl_br)
     sceneObjs[toolObj].brightness += bl_br[1];
 }
 
+// part C
+//  the ambient or diffuse light of the object can be interactively changed by dragging the left mouse button horizontally or vertically;
+//  follow the left button action
+static void adjust_ambient_diffuse(vec2 mat)
+{
+    sceneObjs[toolObj].ambient += mat[0];
+    sceneObjs[toolObj].diffuse += mat[1];
+}
+
+//  the specular light and amount of shine can be interactively adjusted by dragging the middle mouse button horizontally or vertically.
+//  follow the middle button action
+static void adjust_specular_shine(vec2 mat1)
+{
+    sceneObjs[toolObj].specular += mat1[0];
+    sceneObjs[toolObj].shine += mat1[1];
+}
+
+static void adjustAngleYX(vec2 angle_yx)
+{
+    sceneObjs[currObject].angles[1] += angle_yx[0];
+    sceneObjs[currObject].angles[0] += angle_yx[1];
+}
+
+static void adjustAngleZTexscale(vec2 az_ts)
+{
+    sceneObjs[currObject].angles[2] += az_ts[0];
+    sceneObjs[currObject].texScale += az_ts[1];
+}
+
 static void lightMenu(int id)
 {
     deactivateTool();
@@ -536,6 +636,32 @@ static void lightMenu(int id)
         toolObj = 1;
         setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
                          adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
+    }
+
+    //  part I
+    //  move the light 2
+    //  change the R/G/B/ALL of the light 2
+    //  ID for "Move Light 2" is 80
+    else if (id == 80)
+    {
+        toolObj = 2; //  the object need to modify. it is for light 2, so it is 2
+        setToolCallbacks(adjustLocXZ, camRotZ(),
+                         adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
+    }
+    else if (id >= 81 && id <= 84)
+    {
+        toolObj = 2; //  the object need to modify. it is for light 2, so it is 2
+        setToolCallbacks(adjustRedGreen, mat2(1.0, 0, 0, 1.0),
+                         adjustBlueBrightness, mat2(1.0, 0, 0, 1.0));
+    }
+
+    //  part J
+    else if (id == 100)
+    {
+        toolObj = 3; //  the object need to modify. it is for light 3, so it is 3
+        //std::cout << sceneObjs[toolObj].loc << std::endl;
+        setToolCallbacks(adjustLocXZ, camRotZ(),
+                         adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
     }
     else
     {
@@ -574,29 +700,75 @@ static void materialMenu(int id)
     deactivateTool();
     if (currObject < 0)
         return;
+    //  id == 10 means the "R/G/B/All" mode
     if (id == 10)
     {
         toolObj = currObject;
         setToolCallbacks(adjustRedGreen, mat2(1, 0, 0, 1),
                          adjustBlueBrightness, mat2(1, 0, 0, 1));
     }
+    // part C
     // You'll need to fill in the remaining menu items here.
+    /*
+    change the ambient, diffuse or specular, shine when click on the left or middle button
+    id == 20 means the "UNIMPLEMENTED: Ambient/Diffuse/Specular/Shine" mode
+    */
+    else if (id == 20)
+    {
+        toolObj = currObject;
+        setToolCallbacks(adjust_ambient_diffuse, mat2(1, 0, 0, 1),
+                         adjust_specular_shine, mat2(1, 0, 0, 1));
+    }
     else
     {
         printf("Error in materialMenu\n");
+        //toolObj = currObject;
+        //setToolCallbacks(adjustLocXZ, camRotZ(),
+        //                 adjustBrightnessY, mat2(1.0, 0.0, 0.0, 10.0));
     }
 }
 
-static void adjustAngleYX(vec2 angle_yx)
+/*
+part J
+*/
+//  function to duplicated the object
+static void duplicated_object(int cur_obj_id)
 {
-    sceneObjs[currObject].angles[1] += angle_yx[0];
-    sceneObjs[currObject].angles[0] += angle_yx[1];
+    //std::cout << nObjects << std::endl;
+    //  three lights, a test mesh and a square for the ground is 4
+    //  if no test mesh, can not duplicate the object (no object) and return
+    if (nObjects == 4)
+    {
+        //printf("no object to duplicate!\n");
+        return;
+    }
+    sceneObjs[nObjects] = sceneObjs[cur_obj_id];
+    toolObj = cur_obj_id = nObjects++;
+    //  set a new object at the same place with the original one
+    setToolCallbacks(adjustLocXZ, camRotZ(),
+                     adjustScaleY, mat2(0.05, 0, 0, 10));
+    //  redisplay the current window
+    glutPostRedisplay();
 }
 
-static void adjustAngleZTexscale(vec2 az_ts)
+//  function to delete the object
+static void delete_object(int cur_obj_id)
 {
-    sceneObjs[currObject].angles[2] += az_ts[0];
-    sceneObjs[currObject].texScale += az_ts[1];
+    if (nObjects == 4)
+    {
+        //printf("no object to delete!\n");
+        return;
+    }
+    nObjects--;
+    if (nObjects > 4)
+    {
+        currObject = nObjects - 1;
+    }
+    else
+    {
+        currObject = -1;
+    }
+    glutPostRedisplay();
 }
 
 static void mainmenu(int id)
@@ -610,10 +782,23 @@ static void mainmenu(int id)
     }
     if (id == 50)
         doRotate();
+    //  object rotate
     if (id == 55 && currObject >= 0)
     {
+        //currObject = 4;
+        //std::cout << currObject << std::endl;
         setToolCallbacks(adjustAngleYX, mat2(400, 0, 0, -400),
                          adjustAngleZTexscale, mat2(400, 0, 0, 15));
+    }
+    //  part J when user click on the button, call the duplicate function
+    if (id == 90 && currObject >= 0)
+    {
+        duplicated_object(currObject);
+    }
+    //  call the delte function
+    if (id == 91 && currObject >= 0)
+    {
+        delete_object(currObject);
     }
     if (id == 99)
         exit(0);
@@ -625,7 +810,12 @@ static void makeMenu()
 
     int materialMenuId = glutCreateMenu(materialMenu);
     glutAddMenuEntry("R/G/B/All", 10);
-    glutAddMenuEntry("UNIMPLEMENTED: Ambient/Diffuse/Specular/Shine", 20);
+
+    /*
+    part C
+    */
+    //  rename the menu name and keep the same id
+    glutAddMenuEntry("Ambient/Diffuse/Specular/Shine", 20);
 
     int texMenuId = createArrayMenu(numTextures, textureMenuEntries, texMenu);
     int groundMenuId = createArrayMenu(numTextures, textureMenuEntries, groundMenu);
@@ -636,6 +826,9 @@ static void makeMenu()
     glutAddMenuEntry("Move Light 2", 80);
     glutAddMenuEntry("R/G/B/All Light 2", 81);
 
+    //  part J spotlight
+    glutAddMenuEntry("Move Spotlight", 100);
+
     glutCreateMenu(mainmenu);
     glutAddMenuEntry("Rotate/Move Camera", 50);
     glutAddSubMenu("Add object", objectId);
@@ -645,6 +838,10 @@ static void makeMenu()
     glutAddSubMenu("Texture", texMenuId);
     glutAddSubMenu("Ground Texture", groundMenuId);
     glutAddSubMenu("Lights", lightMenuId);
+    //  part J duplicated the object
+    glutAddMenuEntry("Duplicated the object", 90);
+    //  part J delete the object
+    glutAddMenuEntry("Delte the object", 91);
     glutAddMenuEntry("EXIT", 99);
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 }
@@ -725,11 +922,31 @@ void reshape(int width, int height)
     //         that the same part of the scene is visible across the width of
     //         the window.
 
-    GLfloat nearDist = 0.2;
-    projection = Frustum(-nearDist * (float)width / (float)height,
-                         nearDist * (float)width / (float)height,
-                         -nearDist, nearDist,
-                         nearDist, 100.0);
+    //  part D
+    // makes the near distance smaller
+    GLfloat nearDist = 0.002;
+
+    //  part E
+    //  when width < height, we need to change the bottom and top
+    //  otherwise, we need to change left and right
+    if (width < height)
+    //  (float)height / (float)width > 1
+    {
+        projection = Frustum(-nearDist,
+                             nearDist,
+                             -nearDist * (float)height / (float)width,
+                             nearDist * (float)height / (float)width,
+                             nearDist, 100.0);
+    }
+    else
+    //  (float)width / (float)height > 1
+    {
+        projection = Frustum(-nearDist * (float)width / (float)height,
+                             nearDist * (float)width / (float)height,
+                             -nearDist,
+                             nearDist,
+                             nearDist, 100.0);
+    }
 }
 
 //----------------------------------------------------------------------------

@@ -2,6 +2,45 @@ attribute vec3 vPosition;
 attribute vec3 vNormal;
 attribute vec2 vTexCoord;
 
+varying vec3 normal;
+varying vec2 texCoord;
+
+uniform mat4 ModelView;
+uniform mat4 Projection;
+
+varying vec3 fN;
+varying vec3 fV;
+varying vec3 Lvec1;
+varying vec3 Lvec2;
+varying vec3 Lvec3;
+
+uniform vec4 LightPosition1;    //  the position of light1
+uniform vec4 LightPosition2;    //  the position of light2
+uniform vec4 LightPosition3;    //  the position of spotlight
+
+
+
+void main() {
+
+    fN = (ModelView*vec4(vNormal, 0.0)).xyz;
+    fV = -(ModelView*vec4(vPosition, 1.0)).xyz;
+    Lvec1 = LightPosition1.xyz-(ModelView*vec4(vPosition, 1.0)).xyz;
+    Lvec2 = LightPosition2.xyz;
+    Lvec3 = LightPosition3.xyz-(ModelView*vec4(vPosition, 1.0)).xyz;
+
+    normal = vNormal;
+    texCoord = vTexCoord;
+
+    gl_Position = Projection * ModelView * vec4(vPosition, 1.0);
+}
+
+
+//  version for part F
+/*
+attribute vec3 vPosition;
+attribute vec3 vNormal;
+attribute vec2 vTexCoord;
+
 varying vec2 texCoord;
 varying vec4 color;
 
@@ -46,9 +85,23 @@ void main()
 
     // globalAmbient is independent of distance from the light source
     vec3 globalAmbient = vec3(0.1, 0.1, 0.1);
-    color.rgb = globalAmbient  + ambient + diffuse + specular;
+
+    //  part F
+    //  with the distance between light source and object increase, idensity will decrease
+    //  so if the light source close to the object, the object will be light.
+    //  otherwise, it will be dark
+    float a = 0.1;
+    float b = 0.08;
+    float c = 0.08;
+
+    float distance_object_to_light = length(Lvec);
+
+    float attenuation = 1.0/(a+b*distance_object_to_light+c*distance_object_to_light*distance_object_to_light);
+
+    color.rgb = globalAmbient  + ((ambient + diffuse + specular) * attenuation);
     color.a = 1.0;
 
     gl_Position = Projection * ModelView * vpos;
     texCoord = vTexCoord;
 }
+*/

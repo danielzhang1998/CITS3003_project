@@ -1,3 +1,21 @@
+# Project written by:
+
+Hanlin Zhang 22541459
+Mingchuan Tian 22636589
+
+# Final edit at:
+18/05/2021
+
+# Operation system we use for this project:
+
+Mac OS only
+Might works on other platform (win, linux), but did not try to test this
+
+============================================================================================================================================================
+
+
+# To run this code:
+
 # Build Instructions:
 
 ## General Remarks
