@@ -115,6 +115,7 @@ void main() {
     //  part I
     //  Phone reflection
 
+    //  An error here, should not multiple attenuation with the ambient term
     color.rgb = globalAmbient  + ((ambient1 + diffuse1) * attenuation1) + ambient2 + diffuse2 + (ambient3 + diffuse3) * attenuation3;
     color.a = 1.0;
 
