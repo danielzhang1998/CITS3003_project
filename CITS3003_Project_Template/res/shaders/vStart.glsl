@@ -97,7 +97,8 @@ void main()
     float distance_object_to_light = length(Lvec);
 
     float attenuation = 1.0/(a+b*distance_object_to_light+c*distance_object_to_light*distance_object_to_light);
-
+    
+    //  An error here, should not multiple attenuation with the ambient term
     color.rgb = globalAmbient  + ((ambient + diffuse + specular) * attenuation);
     color.a = 1.0;
 
