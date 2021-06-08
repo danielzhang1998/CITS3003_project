@@ -1,4 +1,4 @@
-# This is CITS3003 project
+# This is CITS3003 project for 2021 S1
 
 - HANLIN ZHANG 22541459       
 - MINGCHUAN TIAN 22636589
