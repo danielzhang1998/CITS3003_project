@@ -1,6 +1,7 @@
-- This is CITS3003 project
+# This is CITS3003 project
 
-HANLIN ZHANG 22541459       MINGCHUAN TIAN 22636589
+- HANLIN ZHANG 22541459       
+- MINGCHUAN TIAN 22636589
 
 # Build Instructions:
 
