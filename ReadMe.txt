@@ -1,4 +1,4 @@
-# This is CITS3003 project
+- This is CITS3003 project
 
 # Build Instructions:
 
