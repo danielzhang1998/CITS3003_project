@@ -3,6 +3,11 @@
 - HANLIN ZHANG 22541459       
 - MINGCHUAN TIAN 22636589
 
+# Bugs inside
+
+- Ambient, Specular, Diffuse in fragment shader need to consider multiple with attenuation or not
+- Something not works really fine but the bugs hard to find, maybe?
+
 # Build Instructions:
 
 ## General Remarks
